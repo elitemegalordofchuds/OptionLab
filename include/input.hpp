@@ -37,11 +37,11 @@ inline double inputValue(std::optional<double> min, std::optional<double> max) {
 
 		switch (msg) {
 		case 0:
-			std::cout << "Please enter a valid value\n";
+			std::cout << "Please enter a valid value\n"; break;
 		case 1:
-			std::cout << "Please enter a value greate than " << min.value() << "\n";
+			std::cout << "Please enter a value greate than " << min.value() << "\n"; break;
 		case 2:
-			std::cout << "Please enter a value less than " << max.value() << "\n";
+			std::cout << "Please enter a value less than " << max.value() << "\n"; break;
 		case 3:
 			std::cout << "Please enter a value between " << min.value() << " and " << min.value() << "\n";
 		}

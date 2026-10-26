@@ -18,4 +18,4 @@ endif()
 
 include_directories(include)
 
-add_executable(option_pricer src/main.cpp "include/RNG.hpp"  "include/Types.hpp" "src/Monte-carlo.cpp" "src/Grid-solve.cpp" "src/Black-scholes.cpp" "include/input.hpp")
+add_executable(option_pricer src/main.cpp "include/RNG.hpp"  "include/Types.hpp" "src/Euro/Monte_Carlo_eu.cpp" "src/Grid-solve.cpp" "src/Euro/Black_Scholes_eu.cpp" "include/input.hpp" "include/Result.hpp" "src/Binary_tree.cpp" )
