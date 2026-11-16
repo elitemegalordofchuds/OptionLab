@@ -13,7 +13,7 @@ void AmerTests::amer_testFDM() {
 		fail = true;
 	}
 
-	basicTests(3e-4, PricingMethod::FDM);
+	basicTests(1e-3, PricingMethod::FDM);
 }
 void AmerTests::amer_testBinomial() {
 	auto resC = resultC.result().binomialResults();

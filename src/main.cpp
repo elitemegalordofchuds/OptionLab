@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 				std::transform(arg2.begin(), arg2.end(), arg2.begin(), [](unsigned char c) {return std::tolower(c);});
 				if (arg2 == "european") {
 					if (EuTests::runTests()) {
-						std::cout << "Asian tests passed successfully.\n";
+						std::cout << "European tests passed successfully.\n";
 						return 0;
 					}
 					else return 1;

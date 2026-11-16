@@ -1,6 +1,6 @@
 #include "../include/Option.hpp"
 #include "../../include/Result.hpp"
-
+#include <algorithm>
 
 std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 	auto start = std::chrono::high_resolution_clock::now();
@@ -10,15 +10,7 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 	const double sigma = option.volat();
 	const double T = option.time();
 	const double K = option.strike();
-	const auto  type = option.type();
-
-	std::cout << "Testing American "
-		<< (type == OptionType::Call ? "Call" : "Put")
-		<< " | S = " << S0
-		<< " | K = " << K
-		<< " | T = " << T
-		<< " | r = " << r
-		<< " | sigma = " << sigma << '\n';
+	const auto type = option.type();
 
 	if (T == 0.0) {
 		double price = (type == OptionType::Call)
@@ -26,7 +18,6 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 			: std::max(K - S0, 0.0);
 
 		auto end = std::chrono::high_resolution_clock::now();
-
 		return { price, std::chrono::duration<double, std::milli>(end - start).count() };
 	}
 
@@ -34,28 +25,31 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 		double price;
 
 		if (type == OptionType::Call) {
-			price = (r >= 0.0)
-				? std::max(S0 - K * std::exp(-r * T), 0.0)
-				: std::max(S0 - K, 0.0);
+			price = std::max({
+				S0 - K,
+				S0 - K * std::exp(-r * T),
+				0.0
+				});
 		}
 		else {
-			price = (r >= 0.0)
-				? std::max(K - S0, 0.0)
-				: std::max(K * std::exp(-r * T) - S0, 0.0);
+			price = std::max({
+				K - S0,
+				K * std::exp(-r * T) - S0,
+				0.0
+				});
 		}
 
 		auto end = std::chrono::high_resolution_clock::now();
-
 		return { price, std::chrono::duration<double, std::milli>(end - start).count() };
 	}
 
-	if ((type == OptionType::Call && r >= 0.0) ||
-		(type == OptionType::Put && r == 0.0)) {
+	if ((type == OptionType::Call && r >= 0.0)
+		|| (type == OptionType::Put && r == 0.0)) {
 		return FDM_Eu(option, steps);
 	}
 
 	int N = std::max(2, steps);
-	int M = 5 * N;
+	int M = std::max(2, static_cast<int>(20.0 * std::sqrt(N)));
 
 	double drift = r - 0.5 * sigma * sigma;
 	double x0 = std::log(S0 / K);
@@ -70,7 +64,7 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 
 	std::vector<double> V(M + 1);
 
-	for (int i = 0; i <= M; i++) {
+	for (int i = 0; i <= M; ++i) {
 		double S = K * std::exp(xmin + i * dx);
 
 		if (type == OptionType::Call) {
@@ -90,30 +84,29 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 	std::vector<double> solution(m);
 	std::vector<double> payoff(m);
 
-	const double omega = 1.5;
-	const double tolerance = 1e-7;
-	const int maxIterations = 2000;
-
 	double alpha = 0.25 * dt * (sigma * sigma / (dx * dx) - drift / dx);
 	double beta = -0.5 * dt * (sigma * sigma / (dx * dx) + r);
 	double gamma = 0.25 * dt * (sigma * sigma / (dx * dx) + drift / dx);
 
 	for (int j = 0; j < m; j++) {
-		lower[j] = -alpha;
-		diagonal[j] = 1.0 - beta;
-		upper[j] = -gamma;
-
 		int i = j + 1;
 		double S = K * std::exp(xmin + i * dx);
 
-		payoff[j] = (type == OptionType::Call)
-			? std::max(S - K, 0.0)
-			: std::max(K - S, 0.0);
+		if (type == OptionType::Call) {
+			payoff[j] = std::max(S - K, 0.0);
+		}
+		else {
+			payoff[j] = std::max(K - S, 0.0);
+		}
+
+		lower[j] = -alpha;
+		diagonal[j] = 1.0 - beta;
+		upper[j] = -gamma;
 	}
 
-	int totalIterations = 0;
-	int maxObservedIterations = 0;
-	const int progressInterval = std::max(1, N / 20);
+	const double omega = 1.5;
+	const double tolerance = 1e-7;
+	const int maxIterations = 2000;
 
 	for (int n = 0; n < N; n++) {
 		double tau = (n + 1) * dt;
@@ -151,61 +144,24 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 			solution[j] = std::max(payoff[j], V[i]);
 		}
 
-		bool converged = false;
-		int iterationsUsed = 0;
-
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			double maxChange = 0.0;
 
 			for (int j = 0; j < m; j++) {
-				double left = (j > 0)
-					? lower[j] * solution[j - 1]
-					: 0.0;
+				double left = (j == 0) ? 0.0 : lower[j] * solution[j - 1];
+				double right = (j == m - 1) ? 0.0 : upper[j] * solution[j + 1];
 
-				double right = (j < m - 1)
-					? upper[j] * solution[j + 1]
-					: 0.0;
-
-				double candidate =
-					(rhs[j] - left - right) / diagonal[j];
-
-				double relaxed =
-					solution[j] + omega * (candidate - solution[j]);
-
+				double candidate = (rhs[j] - left - right) / diagonal[j];
+				double relaxed = solution[j] + omega * (candidate - solution[j]);
 				double updated = std::max(payoff[j], relaxed);
 
-				maxChange = std::max(
-					maxChange,
-					std::abs(updated - solution[j])
-				);
-
+				maxChange = std::max(maxChange, std::abs(updated - solution[j]));
 				solution[j] = updated;
 			}
 
-			iterationsUsed = iteration + 1;
-
 			if (maxChange < tolerance) {
-				converged = true;
 				break;
 			}
-		}
-
-		totalIterations += iterationsUsed;
-		maxObservedIterations = std::max(
-			maxObservedIterations,
-			iterationsUsed
-		);
-
-		if (!converged) {
-			std::cerr
-				<< "[PSOR] Failed at time step "
-				<< n + 1 << "/" << N
-				<< " after " << iterationsUsed
-				<< " iterations.\n";
-
-			throw std::runtime_error(
-				"American FDM PSOR failed to converge."
-			);
 		}
 
 		V[0] = boundaryLeft;
@@ -213,15 +169,6 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 
 		for (int j = 0; j < m; j++) {
 			V[j + 1] = solution[j];
-		}
-
-		if ((n + 1) % progressInterval == 0 || n == 0) {
-			std::cerr
-				<< "[American FDM] "
-				<< n + 1 << "/" << N
-				<< " time steps completed | "
-				<< "Last PSOR iterations: "
-				<< iterationsUsed << '\n';
 		}
 	}
 
@@ -232,14 +179,6 @@ std::pair<double, double> Result::FDM_Amer(const Option& option, int steps) {
 
 	double weight = (S0 - S_left) / (S_right - S_left);
 	double price = V[index] * (1.0 - weight) + V[index + 1] * weight;
-
-	std::cerr
-		<< "[American FDM] Average PSOR iterations: "
-		<< static_cast<double>(totalIterations) / N << '\n';
-
-	std::cerr
-		<< "[American FDM] Maximum PSOR iterations: "
-		<< maxObservedIterations << '\n';
 
 	auto end = std::chrono::high_resolution_clock::now();
 

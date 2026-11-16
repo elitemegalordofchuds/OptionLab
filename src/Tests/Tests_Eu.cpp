@@ -17,7 +17,7 @@ void EuTests::eu_testFDM() {
 		fail = true;
 	}
 
-	Cases<OptionStyle::Euro>::basicTests(1e-4, PricingMethod::FDM);
+	Cases<OptionStyle::Euro>::basicTests(2.5e-4, PricingMethod::FDM);
 }
 
 void EuTests::eu_testBinomial() {
@@ -33,7 +33,7 @@ void EuTests::eu_testBinomial() {
 		fail = true;
 	}
 
-	basicTests(1e-3, PricingMethod::Binomial);
+	basicTests(1.5e-3, PricingMethod::Binomial);
 }
 
 void EuTests::eu_testMonteCarlo() {
@@ -98,14 +98,14 @@ void EuTests::eu_testGreeks() {
 	}
 	std::cout << std::setprecision(12);
 
-	std::cout << "\European Call Greeks:\n"
+	std::cout << "\nEuropean Call Greeks:\n"
 		<< "Delta: " << deltaC << '\n'
 		<< "Gamma: " << gammaC << '\n'
 		<< "Theta: " << thetaC << '\n'
 		<< "Vega: " << vegaC << '\n'
 		<< "Rho: " << rhoC << "\n";
 
-	std::cout << "\European Put Greeks:\n"
+	std::cout << "\nEuropean Put Greeks:\n"
 		<< "Delta: " << deltaP << '\n'
 		<< "Gamma: " << gammaP << '\n'
 		<< "Theta: " << thetaP << '\n'

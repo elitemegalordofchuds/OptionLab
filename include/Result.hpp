@@ -54,11 +54,11 @@ public:
                 if (option.style() == OptionStyle::Euro) {
                     price_time_error_monteC[i] = monteCarlo_Eu(option, static_cast<int>(std::pow(10, i + 2)));
                     price_time_FDM[i] = FDM_Eu(option, 400 * (i + 1));
-                    price_time_binomial[i] = binomial_Eu(option, 3000 * (i + 1));
+                    price_time_binomial[i] = binomial_Eu(option, 4000 * (i + 1));
                 }
                 else if (option.style() == OptionStyle::American) {
                     price_time_FDM[i] = FDM_Amer(option, 400 * (i + 1));
-                    price_time_binomial[i] = binomial_Amer(option, 3000 * (i + 1));
+                    price_time_binomial[i] = binomial_Amer(option, 4000 * (i + 1));
                 }
                 else if (option.style() == OptionStyle::Asian) {
                     price_time_error_monteC[i] = monteCarlo_Asian(option, static_cast<int>(std::pow(10, i + 2)));
@@ -80,12 +80,12 @@ public:
             if (option.style() == OptionStyle::Euro) {
                 price_time_error_monteC[4] = monteCarlo_Eu(option, static_cast<int>(std::pow(10, 4 + 2)));
                 price_time_FDM[4] = FDM_Eu(option, 2000);
-                price_time_binomial[4] = binomial_Eu(option, 15000);
+                price_time_binomial[4] = binomial_Eu(option, 20000);
                 price_default = closedForm_Eu(option);
             }
             else if (option.style() == OptionStyle::American) {
-                price_time_FDM[4] = FDM_Amer(option, 2000);
-                price_time_binomial[4] = binomial_Amer(option, 15000);
+                price_time_FDM[4] = FDM_Amer(option, 4000);
+                price_time_binomial[4] = binomial_Amer(option, 20000);
                 price_default = binomial_Amer(option, 20000).first;
             }
             else if (option.style() == OptionStyle::Asian) {
