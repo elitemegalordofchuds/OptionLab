@@ -1,21 +1,33 @@
+
 cmake_minimum_required(VERSION 3.20)
-project(quant_engine VERSION 1.0 LANGUAGES CXX)
+
+project(OptionPricer LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    if(MSVC) 
-        add_compile_options(/O2 /arch:AVX2 /W4)
-    else() 
-        add_compile_options(-O3 -mavx2 -mfma -Wall -Wextra)
-    endif()
-elseif(MSVC)
-    add_compile_options(/O2 /arch:AVX2 /W4)
-else()
-    add_compile_options(-O3 -mavx2 -mfma -Wall -Wextra)
-endif()
+add_executable(option_pricer
+    src/main.cpp
 
-include_directories(include)
+    src/Amer/Binomial_Amer.cpp
+    src/Amer/Default_Amer.cpp
+    src/Amer/FDM_Amer.cpp
 
-add_executable(option_pricer src/main.cpp "include/RNG.hpp"  "include/Types.hpp" "src/Euro/Monte_Carlo_eu.cpp" "src/Grid-solve.cpp" "src/Euro/Black_Scholes_eu.cpp" "include/input.hpp" "include/Result.hpp" "src/Binary_tree.cpp" )
+    src/Asian/Default_Asian.cpp
+    src/Asian/MonteCarlo_Asian.cpp
+
+    src/Euro/Binomial_Eu.cpp
+    src/Euro/ClosedForm_Eu.cpp
+    src/Euro/Default_Eu.cpp
+    src/Euro/FDM_Eu.cpp
+    src/Euro/MonteCarlo_Eu.cpp
+
+    src/Tests/Tests_Amer.cpp
+    src/Tests/Tests_Asian.cpp
+    src/Tests/Tests_Eu.cpp
+ "src/Tests/TestStructure.cpp")
+
+target_include_directories(option_pricer PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+)

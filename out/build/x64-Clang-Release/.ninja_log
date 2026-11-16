@@ -1,4 +1,0 @@
-# ninja log v7
-185	705	8136822049888863	CMakeFiles/option_pricer.dir/src/Grid-solve.cpp.obj	1a52695382a5ac
-243	784	8136822050456364	CMakeFiles/option_pricer.dir/src/Binary_tree.cpp.obj	271550e6ed59b149
-204	1518	8136822050063632	CMakeFiles/option_pricer.dir/src/Black-scholes.cpp.obj	3e81158e60c7b6dd

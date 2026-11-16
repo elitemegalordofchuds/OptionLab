@@ -1,7 +1,7 @@
 #include <cstdint>
 
-#ifndef TYPES_HPP
-#define TYPES_HPP
+#ifndef OPTION_HPP
+#define OPTION_HPP
 
 enum class OptionStyle : uint8_t {
 	American = 1,
@@ -37,13 +37,15 @@ private:
 	int asian_steps{};
 
 public:
-	Option() = default;
+	Option(OptionStyle style = OptionStyle::Euro, OptionType type = OptionType::Call, double spot = 0, double strike = 0, double time = 0,double interest = 0, double volatility = 0, int steps = 0) :
+		op_style{ style }, op_type{ type }, op_spot{ spot }, op_strike{ strike }, op_time{ time }, op_interest{ interest }, op_volatility{ volatility },
+		asian_steps{ steps } {}
 	void setStyle(OptionStyle style) {
 		switch (style) {
 		case OptionStyle::American:
-			op_style = OptionStyle::American;
+			op_style = OptionStyle::American; break;
 		case OptionStyle::Euro:
-			op_style = OptionStyle::Euro;
+			op_style = OptionStyle::Euro; break;
 		case OptionStyle::Asian:
 			op_style = OptionStyle::Asian;
 		}
@@ -51,7 +53,7 @@ public:
 	void setType(OptionType type) {
 		switch (type) {
 		case OptionType::Call:
-			op_type = OptionType::Call;
+			op_type = OptionType::Call; break;
 		case OptionType::Put:
 			op_type = OptionType::Put;
 		}
