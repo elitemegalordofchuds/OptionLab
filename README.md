@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/35187785/README.md)
+[README.md](https://github.com/user-attachments/files/35188096/README.md)
 # OptionLab
 
 OptionLab is a C++20 application I developed to investigate numerical methods used in option pricing. The main objective of this project was not simply to implement several pricing algorithms and obtain option prices. I also wanted to understand how these methods work and examine how their accuracy and computational cost change as the numerical resolution increases.
@@ -96,7 +96,7 @@ The technical report discusses the mathematical foundations of the pricing model
 
 The report will be available here:
 
-(docs/OptionLab_TechnicalReport.pdf)
+[OptionLab Technical Report](documents/OptionLab_TechnicalReport.pdf)
 
 ## Assumptions and limitations
 
