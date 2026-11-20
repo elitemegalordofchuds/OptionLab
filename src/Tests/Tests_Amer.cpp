@@ -3,13 +3,13 @@
 void AmerTests::amer_testFDM() {
 	auto resC = resultC.result().FDMResults();
 	if (!(std::abs(resC[0].first - resultC.expectedPrice()) > std::abs(resC[4].first - resultC.expectedPrice()))) {
-		std::cerr << "Error: FDM results do not converge for American call\n";
+		std::cerr << "Error: FDM results do not converge for American call. Error code 1\n";
 		fail = true;
 	}
 
 	auto resP = resultP.result().FDMResults();
 	if (!(std::abs(resP[0].first - resultP.expectedPrice()) > std::abs(resP[4].first - resultP.expectedPrice()))) {
-		std::cerr << "Error: FDM results do not converge for American put\n";
+		std::cerr << "Error: FDM results do not converge for American put. Error code 1\n";
 		fail = true;
 	}
 
@@ -22,19 +22,10 @@ void AmerTests::amer_testBinomial() {
 		fail = true;
 	}
 
-	auto resP = resultP.result().FDMResults();
-
-	const std::array<int, 5> steps{ 200, 400, 600, 800, 1000 };
-
-	std::cout << std::setprecision(15)
-		<< "\nAmerican put FDM convergence:\n";
-
-	for (std::size_t i = 0; i < resP.size(); ++i) {
-		double error = std::abs(resP[i].first - resultP.expectedPrice());
-
-		std::cout << steps[i] << " steps | Price: "
-			<< resP[i].first << " | Error: "
-			<< error << '\n';
+	auto resP = resultP.result().binomialResults();
+	if (!(std::abs(resP[0].first - resultP.expectedPrice()) > std::abs(resP[4].first - resultP.expectedPrice()))) {
+		std::cerr << "Error: binomial results do not converge for American put. Error code 1\n";
+		fail = true;
 	}
 	basicTests(2.5e-3, PricingMethod::Binomial);
 }

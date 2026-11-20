@@ -65,9 +65,9 @@ void Result::defaultPricer_Asian(const Option& option, int paths) {
 	std::pair<double, double> sum_bumped_time{ 0, 0 };
 	double sumpaths_bumped_time{ 0 };
 
-	int threads = std::thread::hardware_concurrency();
-	if (threads == 0) threads = 1;
 	const int pairs = paths / 2;
+	int threads = std::min(static_cast<int> (std::thread::hardware_concurrency()), pairs);
+	if (threads == 0) threads = 1;
 	const int pairs_thread = pairs / threads;
 	const int remainder = pairs % threads;
 	std::vector<std::future<std::array<double, 6>>> futures;

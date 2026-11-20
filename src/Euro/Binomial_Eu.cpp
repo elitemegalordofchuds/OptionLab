@@ -57,5 +57,5 @@ std::pair<double, double> Result::binomial_Eu(const Option& option, int steps) {
 		max--;
 	}
 	auto end = std::chrono::high_resolution_clock::now();
-	return { maturity[0], std::chrono::duration_cast<std::chrono::microseconds> (end - start).count()};
+	return { maturity[0], std::chrono::duration<double, std::milli> (end - start).count()};
 }

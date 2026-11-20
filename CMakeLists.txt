@@ -1,13 +1,13 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-project(OptionPricer LANGUAGES CXX)
+project(OptionLab LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(option_pricer
+add_executable(OptionLab
     src/main.cpp
 
     src/Amer/Binomial_Amer.cpp
@@ -26,8 +26,13 @@ add_executable(option_pricer
     src/Tests/Tests_Amer.cpp
     src/Tests/Tests_Asian.cpp
     src/Tests/Tests_Eu.cpp
- "src/Tests/TestStructure.cpp")
+    src/Tests/TestStructure.cpp
+)
 
-target_include_directories(option_pricer PRIVATE
+target_include_directories(OptionLab PRIVATE
     ${PROJECT_SOURCE_DIR}/include
+)
+
+target_compile_definitions(OptionLab PRIVATE
+    "OPTIONLAB_PROJECT_DIR=\"${PROJECT_SOURCE_DIR}\""
 )

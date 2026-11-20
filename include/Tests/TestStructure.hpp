@@ -1,7 +1,7 @@
 #include "../Result.hpp"
 
 #ifndef TESTSTRUCTURE_HPP
-#define TESTSTRUCTURE_HZPP
+#define TESTSTRUCTURE_HPP
 enum class PricingMethod {
 	ClosedForm = 1,
 	FDM,
@@ -82,8 +82,8 @@ public:
 template <OptionStyle style>
 class Cases {
 protected:
-	Case resultC{ { style, OptionType::Call, 100.0, 100.0, 1.0, 0.05, 0.2, 12 }, Mode::Expirement, true };
-	Case resultP{ { style, OptionType::Put, 100.0, 100.0, 1.0, 0.05, 0.2, 12 }, Mode::Expirement, true };
+	Case resultC{ { style, OptionType::Call, 100.0, 100.0, 1.0, 0.05, 0.2, 12 }, Mode::Experiment, true };
+	Case resultP{ { style, OptionType::Put, 100.0, 100.0, 1.0, 0.05, 0.2, 12 }, Mode::Experiment, true };
 
 	Case resultC_bumped_spot{ { style, OptionType::Call, 150.0, 100.0, 1.0, 0.05, 0.2, 12 } };
 	Case resultP_bumped_spot{ { style, OptionType::Put, 150.0, 100.0, 1.0, 0.05, 0.2, 12 } };

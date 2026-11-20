@@ -63,5 +63,5 @@ std::pair<double, double> Result::binomial_Amer(const Option& option, int steps)
 		}
 	}
 	auto end = std::chrono::high_resolution_clock::now();
-	return { currentV[0], std::chrono::duration_cast<std::chrono::microseconds> (end - start).count()};
+	return { currentV[0], std::chrono::duration<double, std::milli> (end - start).count()};
 }

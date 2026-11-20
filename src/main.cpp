@@ -2,6 +2,10 @@
 #include <optional>
 #include "../include/Result.hpp"
 #include "../include/Tests/TestRunners.hpp"
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <string_view>
 
 int main(int argc, char* argv[]) {
 	if (argc > 1) {
@@ -41,8 +45,8 @@ int main(int argc, char* argv[]) {
 				return 1;
 			}
 			else {
-				bool fail = EuTests::runTests() + AmerTests::runTests() + AsianTests::runTests();
-				if (fail) {
+				int allPass = EuTests::runTests() + AmerTests::runTests() + AsianTests::runTests();
+				if (allPass < 3) {
 					std::cerr << "Something went wrong...";
 					return 1;
 				}
@@ -52,44 +56,44 @@ int main(int argc, char* argv[]) {
 		}
 		else {
 			std::cout << "Available commands : \n"
-				<< "  option_pricer\n"
-				<< "  option_pricer --test\n"
-				<< "  option_pricer --test european\n"
-				<< "  option_pricer --test american\n"
-				<< "  option_pricer --test asian\n";
+				<< "  OptionLab\n"
+				<< "  OptionLab --test\n"
+				<< "  OptionLab --test european\n"
+				<< "  OptiopLab --test american\n"
+				<< "  OptionLab --test asian\n";
 			return 1;
 		}
 	}
 
 	Option option{};
-	std::cout << "Chose operating mode: \n1)Default\t\t2)Experiment\n";
-	bool expirement = inputChoice(1, 2) - 1;
+	std::cout << "Choose operating mode: \n1)Default\t\t2)Experiment\n";
+	bool experiment = inputChoice(1, 2) - 1;
 
 
-	std::cout << "===============================================================================================================================\n";
-	std::cout << "Chose option style: \n1)American\t\t2)European\t\t3)Asian\n";
+	printSeparator();
+	std::cout << "Choose option style: \n1)American\t\t2)European\t\t3)Asian\n";
 	OptionStyle style = static_cast<OptionStyle> (inputChoice(1, 3));
 	option.setStyle(style);
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Choose option type: \n1)Call\t\t2)Put\n";
 	OptionType type = static_cast<OptionType> (inputChoice(1, 2));
 	option.setType(type);
 
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Input spot price: ";
 	option.setSpot(inputValue(0, std::nullopt));
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Input strike price: ";
 	option.setStrike(inputValue(0, std::nullopt));
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Choose unit of time: \n1)Hours\t\t2)Days\t\t3)Weeks\t\t4)Months\t\t5)Years\n";
 	int unit = inputChoice(1, 5);
 	std::cout << "Enter number of ";
@@ -107,27 +111,59 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << " till expiration\n";
 	option.setTime(static_cast<TimeUnit> (unit), inputValue(0, std::nullopt));
+	if (option.style() == OptionStyle::Asian) {
+		printSeparator();
+		std::cout << "Choose averaging rate: \n1)Daily\t\t2)Weekly\t\t3)Monthly\n";
+		AveragingRate rate = static_cast<AveragingRate> (inputChoice(1, 3));
+		option.setSteps(rate);
+	}
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Input volatility constant: ";
 	option.setVolat(inputValue(0, std::nullopt));
 
 
-	std::cout << "===============================================================================================================================\n";
+	printSeparator();
 	std::cout << "Input risk free interest rate%: ";
-	option.setInter(inputValue(0, 100));
+	option.setInter(inputValue(0, 100) / 100);
+	printSeparator();
 
 
-	Result result{ option, expirement ? Mode::Expirement : Mode::Default };
+	Result result{ option, experiment ? Mode::Experiment : Mode::Default };
 	result.Print();
-	std::cout << "===============================================================================================================================\n";
-	std::cout << "Do you wish to export the results as a csv file? \n1)Yes 2)No";
-	bool noExport = inputChoice(1, 2) - 1;
-	if (!noExport) {
-		std::cout << "Please name you results file: ";
-		std::string filename{};
-		std::cin >> filename;
-		result.Export(filename);
+	if (experiment) {
+		printSeparator();
+		std::cout << "Do you wish to export the results as csv files? \n1)Yes\t\t2)No\n";
+		bool noExport = inputChoice(1, 2) - 1;
+		if (!noExport) {
+			std::string filename{};
+			std::cout << "Please name your results folder.\n";
+			std::cin >> filename;
+			while (result.Export(filename) != 0) {
+				std::cout << "Something went wrong during the export process. Do you wish to try again?\n";
+				noExport = inputChoice(1, 2) - 1;
+				if (!noExport) {
+					std::cout << "Please name your results folder.\n";
+					std::cin >> filename;
+				}
+				else {
+					return 0;
+				}
+			}
+			printSeparator();
+			std::cout << "Do you wish to graph the results? \n1)Yes\t\t2)No\n";
+			bool noGraph = inputChoice(1, 2) - 1;
+			if (!noGraph) {
+				if (generateGraphs(filename) == 0) {
+					std::cout << "Graphs generated successfully!\n";
+				}
+				else {
+					std::cerr << "Graph generation failed. Check that Python 3 and Matplotlib are installed.\n";
+					return 1;
+				}
+			}
+		}
 	}
+	return 0;
 }

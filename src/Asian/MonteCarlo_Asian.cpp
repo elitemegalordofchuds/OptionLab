@@ -33,9 +33,9 @@ std::tuple<double, double, double> Result::monteCarlo_Asian(const Option& option
 	double sumSqr{};
 	double total{};
 	
-	int threads = std::thread::hardware_concurrency();
-	if (threads == 0) threads = 1;
 	const int pairs = paths / 2;
+	int threads = std::min(static_cast<int> (std::thread::hardware_concurrency()), pairs);
+	if (threads == 0) threads = 1;
 	const int pairs_thread = pairs / threads;
 	const int remainder = pairs % threads;
 	std::vector<std::future<std::pair<double, double>>> futures;
@@ -85,7 +85,7 @@ std::tuple<double, double, double> Result::monteCarlo_Asian(const Option& option
 		sumSqr += second;
 	}
 	const double price = sumpaths * std::exp(-r * T) / pairs;
-	const double SE = std::exp(-r * T) * std::sqrt((sumSqr - sumpaths * sumpaths / pairs) / (pairs * (pairs - 1)));
+	const double SE = std::exp(-r * T) * std::sqrt((sumSqr - sumpaths * sumpaths / pairs) / (static_cast<double>(pairs) * (pairs - 1)));
 	auto end = std::chrono::high_resolution_clock::now();
-	return { price, std::chrono::duration_cast<std::chrono::microseconds> (end - start).count(), SE };
+	return { price, std::chrono::duration<double, std::milli> (end - start).count(), SE };
 }
