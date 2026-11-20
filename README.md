@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/35188096/README.md)
+[README.md](https://github.com/user-attachments/files/35188325/README.md)
 # OptionLab
 
 OptionLab is a C++20 application I developed to investigate numerical methods used in option pricing. The main objective of this project was not simply to implement several pricing algorithms and obtain option prices. I also wanted to understand how these methods work and examine how their accuracy and computational cost change as the numerical resolution increases.
@@ -43,7 +43,11 @@ The graph-generation script requires Python 3 and Matplotlib. The application ca
 
 ## Building the project
 
-The project is built using CMake and requires a C++20-compatible compiler. The following commands use the Visual Studio 2022 generator on Windows. Run them from the root directory of the repository:
+The project is built using CMake and requires a C++20-compatible compiler. The commands below show how to build the project using Visual Studio 2022 on Windows, as well as using a default CMake generator on Linux or macOS.
+
+### Windows (Visual Studio 2022)
+
+Run the following commands from the root directory of the repository:
 
 ```powershell
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64
@@ -51,6 +55,23 @@ cmake --build build --config Release
 ```
 
 With this generator, the executable is normally created at `build/Release/OptionLab.exe`.
+
+### Linux and macOS
+
+With CMake and a C++20-compatible compiler installed, run the following commands from the root directory of the repository:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+```
+
+For the usual single-configuration CMake generators, the executable is normally created at `build/OptionLab`. It can then be run using:
+
+```bash
+./build/OptionLab
+```
+
+The utility code includes platform-specific process-launching and terminal-width implementations for Windows and POSIX systems. However, the project has only been built and tested on Windows. The Linux and macOS commands are included as a starting point, but builds and runtime behaviour on those platforms have not been independently verified.
 
 ## Running the application
 
@@ -60,7 +81,13 @@ To start the interactive application on Windows, run:
 .\build\Release\OptionLab.exe
 ```
 
-The testing mode can be accessed using the `--test` command-line argument. To run all test suites:
+On Linux or macOS, using the default single-configuration build described above, run:
+
+```bash
+./build/OptionLab
+```
+
+The testing mode can be accessed using the `--test` command-line argument. To run all test suites on Windows:
 
 ```powershell
 .\build\Release\OptionLab.exe --test
@@ -74,18 +101,43 @@ An individual test suite can also be selected:
 .\build\Release\OptionLab.exe --test asian
 ```
 
+On Linux or macOS, use the corresponding executable path:
+
+```bash
+./build/OptionLab --test
+./build/OptionLab --test european
+./build/OptionLab --test american
+./build/OptionLab --test asian
+```
+
 ## Python requirements
 
-The Python dependency used by the graph-generation script is listed in `requirements.txt`. On Windows, it can be installed using:
+The Python dependency used by the graph-generation script is listed in `requirements.txt`.
+
+On Windows, it can be installed using:
 
 ```powershell
 py -3 -m pip install -r requirements.txt
 ```
 
-The script can also be run directly from the repository's root directory by passing the name of the experiment folder created under `results/`:
+On Linux or macOS, it can be installed using:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+The script can also be run directly from the repository's root directory by passing the name of the experiment folder created under `results/`.
+
+On Windows:
 
 ```powershell
 py -3 analysis\plot_results.py ExperimentFolder
+```
+
+On Linux or macOS:
+
+```bash
+python3 analysis/plot_results.py ExperimentFolder
 ```
 
 For example, if the CSV files are stored in `results/European_Experiment`, replace `ExperimentFolder` with `European_Experiment`. The generated graphs will be saved in `graphs/European_Experiment`.
@@ -94,7 +146,7 @@ For example, if the CSV files are stored in `results/European_Experiment`, repla
 
 The technical report discusses the mathematical foundations of the pricing models, the numerical methods used in the application, the implementation and testing framework, and the experimental results in greater detail.
 
-The report will be available here:
+The report is available here:
 
 [OptionLab Technical Report](documents/OptionLab_TechnicalReport.pdf)
 
